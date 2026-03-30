@@ -1,0 +1,86 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# ========================
+# Entorno virtual
+# ========================
+venv/
+.venv/
+env/
+ENV/
+
+# ========================
+# Variables de entorno
+# ========================
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ========================
+# IDEs y editores
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ========================
+# Sistema operativo
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ========================
+# Testing
+# ========================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# ========================
+# Logs
+# ========================
+*.log
+logs/
+
+# ========================
+# Base de datos local
+# ========================
+*.db
+*.sqlite3
+
+# ========================
+# Jupyter (si aplica)
+# ========================
+.ipynb_checkpoints/
+
+# ========================
+# MyPy / Type checking
+# ========================
+.mypy_cache/
+.dmypy.json
+
+# ========================
+# Distribuciones
+# ========================
+*.tar.gz
+*.zip
