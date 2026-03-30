@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from fastapi import HTTPException
-from sqlalchemy import select, func
+from sqlalchemy import select, update, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.task import Task, TaskStatus, TaskPriority
@@ -52,6 +52,71 @@ async def delete_task(db: AsyncSession, task_id: int) -> None:
     task = await get_task(db, task_id)
     await db.delete(task)
     await db.commit()
+
+
+async def bulk_update_status(
+    db: AsyncSession,
+    new_status: TaskStatus,
+    status_filter: TaskStatus | None = None,
+    priority_filter: TaskPriority | None = None,
+) -> int:
+    query = update(Task).values(status=new_status)
+    if status_filter:
+        query = query.where(Task.status == status_filter)
+    if priority_filter:
+        query = query.where(Task.priority == priority_filter)
+    result = await db.execute(query)
+    await db.commit()
+    return result.rowcount
+
+
+async def bulk_delete(
+    db: AsyncSession,
+    status_filter: TaskStatus | None = None,
+    priority_filter: TaskPriority | None = None,
+) -> int:
+    query = delete(Task)
+    if status_filter:
+        query = query.where(Task.status == status_filter)
+    if priority_filter:
+        query = query.where(Task.priority == priority_filter)
+    result = await db.execute(query)
+    await db.commit()
+    return result.rowcount
+
+
+async def count_tasks(db: AsyncSession, filters: TaskFilters) -> int:
+    query = select(func.count(Task.id))
+    if filters.status:
+        query = query.where(Task.status == filters.status)
+    if filters.priority:
+        query = query.where(Task.priority == filters.priority)
+    if filters.date_from:
+        query = query.where(Task.due_date >= filters.date_from)
+    if filters.date_to:
+        query = query.where(Task.due_date <= filters.date_to)
+    return await db.scalar(query) or 0
+
+
+async def get_most_urgent(db: AsyncSession) -> Task | None:
+    now = datetime.utcnow()
+    result = await db.execute(
+        select(Task)
+        .where(Task.due_date is not None, Task.due_date >= now, Task.status != TaskStatus.completed)
+        .order_by(Task.due_date.asc())
+        .limit(1)
+    )
+    return result.scalar_one_or_none()
+
+
+async def get_overdue_tasks(db: AsyncSession) -> list[Task]:
+    now = datetime.utcnow()
+    result = await db.execute(
+        select(Task)
+        .where(Task.due_date < now, Task.status != TaskStatus.completed)
+        .order_by(Task.due_date.asc())
+    )
+    return list(result.scalars().all())
 
 
 async def get_tasks_summary(db: AsyncSession) -> dict:
