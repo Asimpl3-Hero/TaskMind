@@ -7,3 +7,5 @@ pydantic
 pydantic-settings
 openai
 python-dotenv
+streamlit
+httpx
