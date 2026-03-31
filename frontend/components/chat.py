@@ -44,8 +44,16 @@ def render():
 def _render_actions(actions: list):
     summary_lines = []
     for a in actions:
-        args_str = ", ".join(f"{k}={v}" for k, v in a["arguments"].items())
-        summary_lines.append(f"**{a['tool']}**({args_str})")
+        result = a.get("result", {})
+        is_error = isinstance(result, dict) and "error" in result
+        icon = "&#10060;" if is_error else "&#9989;"
+        css_class = "actions-box-error" if is_error else "actions-box"
 
-    content = "<br>".join(summary_lines)
-    st.markdown(f'<div class="actions-box">{content}</div>', unsafe_allow_html=True)
+        args_str = ", ".join(f"{k}={v}" for k, v in a["arguments"].items())
+        line = f"{icon} **{a['tool']}**({args_str})"
+        if is_error:
+            line += f" — {result['error']}"
+        summary_lines.append((line, css_class))
+
+    for line, css_class in summary_lines:
+        st.markdown(f'<div class="{css_class}">{line}</div>', unsafe_allow_html=True)

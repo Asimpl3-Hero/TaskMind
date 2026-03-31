@@ -53,7 +53,7 @@ def get_summary() -> dict | None:
     return r.json() if r.status_code == 200 else None
 
 
-def get_weekly_completed() -> list:
+def get_monthly_created() -> list:
     with _client() as c:
-        r = c.get("/api/summary/weekly-completed")
+        r = c.get("/api/summary/monthly-created")
     return r.json() if r.status_code == 200 else []

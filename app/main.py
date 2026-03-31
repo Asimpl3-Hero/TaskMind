@@ -1,11 +1,16 @@
+import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import settings
 from app.database import engine
 from app.routers import tasks, agent, summary
+
+logger = logging.getLogger(__name__)
 
 DESCRIPTION = """
 ## TaskMind API
@@ -62,6 +67,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(SQLAlchemyError)
+async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError):
+    logger.error("Database error on %s %s: %s", request.method, request.url.path, exc)
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "Error de conexion con la base de datos. Intente nuevamente."},
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.error(
+        "Unhandled error on %s %s: %s", request.method, request.url.path, exc, exc_info=True,
+    )
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Error interno del servidor."},
+    )
 
 
 app.include_router(tasks.router)

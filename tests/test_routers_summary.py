@@ -4,15 +4,15 @@ import pytest
 from httpx import AsyncClient
 
 
-class TestWeeklyCompletedEndpoint:
+class TestMonthlyCreatedEndpoint:
     @pytest.mark.asyncio
-    async def test_weekly_completed(self, client: AsyncClient):
-        response = await client.get("/api/summary/weekly-completed")
+    async def test_monthly_created(self, client: AsyncClient):
+        response = await client.get("/api/summary/monthly-created")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 7
+        assert len(data) == 5
         for entry in data:
-            assert "date" in entry
+            assert "month" in entry
             assert "count" in entry
 
 

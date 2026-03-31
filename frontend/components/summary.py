@@ -4,28 +4,29 @@ import pandas as pd
 from frontend import api
 from frontend.styles import PRIORITY_LABELS, STATUS_LABELS
 
-DAY_NAMES = {
-    0: "Lun", 1: "Mar", 2: "Mie", 3: "Jue", 4: "Vie", 5: "Sab", 6: "Dom",
+MONTH_NAMES = {
+    1: "Ene", 2: "Feb", 3: "Mar", 4: "Abr", 5: "May", 6: "Jun",
+    7: "Jul", 8: "Ago", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dic",
 }
 
 
-def _render_weekly_chart():
-    data = api.get_weekly_completed()
+def _render_monthly_chart():
+    data = api.get_monthly_created()
     if not data:
-        st.info("No hay datos de la semana.")
+        st.info("No hay datos para mostrar.")
         return
 
     df = pd.DataFrame(data)
-    df["date"] = pd.to_datetime(df["date"])
-    df["day"] = df["date"].dt.dayofweek.map(DAY_NAMES)
-    df = df.set_index("day")
+    df["month_date"] = pd.to_datetime(df["month"] + "-01")
+    df["label"] = df["month_date"].dt.month.map(MONTH_NAMES) + " " + df["month_date"].dt.year.astype(str).str[-2:]
+    df = df.set_index("label")
 
-    st.markdown("#### Tareas completadas esta semana")
+    st.markdown("#### Tareas creadas por mes (5 meses)")
     st.bar_chart(df["count"], color="#0984e3")
 
 
 def render():
-    _render_weekly_chart()
+    _render_monthly_chart()
 
     st.markdown("---")
 

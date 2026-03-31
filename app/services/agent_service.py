@@ -1,17 +1,25 @@
 import json
+import logging
 
-from openai import AsyncOpenAI
+from fastapi import HTTPException
+from openai import AsyncOpenAI, APIConnectionError, RateLimitError, APIStatusError
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.agent.prompts import get_system_prompt
 from app.agent.tools import TOOL_DEFINITIONS
 from app.agent import memory
+from app.exceptions import ExternalServiceError, AgentTimeoutError
 from app.models.task import TaskStatus, TaskPriority
 from app.schemas.task import TaskCreate, TaskUpdate, TaskFilters
 from app.services import task_service
 
+logger = logging.getLogger(__name__)
+
 client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+
+MAX_AGENT_ITERATIONS = 10
 
 
 def _serialize_task(task) -> dict:
@@ -31,7 +39,10 @@ async def execute_tool(tool_name: str, arguments: dict, db: AsyncSession) -> str
     try:
         result = await _run_tool(tool_name, arguments, db)
         return json.dumps(result, ensure_ascii=False)
-    except Exception as e:
+    except HTTPException as e:
+        return json.dumps({"error": e.detail}, ensure_ascii=False)
+    except (ValidationError, ValueError, KeyError) as e:
+        logger.warning("Error de validacion en tool '%s': %s", tool_name, e)
         return json.dumps({"error": str(e)}, ensure_ascii=False)
 
 
@@ -118,13 +129,23 @@ async def chat(message: str, session_id: str, db: AsyncSession) -> dict:
 
     actions_taken = []
 
-    while True:
-        response = await client.chat.completions.create(
-            model=settings.OPENAI_MODEL,
-            messages=messages,
-            tools=TOOL_DEFINITIONS,
-            tool_choice="auto",
-        )
+    for _ in range(MAX_AGENT_ITERATIONS):
+        try:
+            response = await client.chat.completions.create(
+                model=settings.OPENAI_MODEL,
+                messages=messages,
+                tools=TOOL_DEFINITIONS,
+                tool_choice="auto",
+            )
+        except APIConnectionError:
+            logger.error("No se pudo conectar con OpenAI en agent chat")
+            raise ExternalServiceError("OpenAI", "no se pudo establecer conexion")
+        except RateLimitError:
+            logger.warning("Rate limit alcanzado en OpenAI en agent chat")
+            raise ExternalServiceError("OpenAI", "limite de solicitudes excedido, intente mas tarde")
+        except APIStatusError as e:
+            logger.error("Error de API OpenAI (status %s): %s", e.status_code, e.message)
+            raise ExternalServiceError("OpenAI", f"error del servicio (status {e.status_code})")
 
         choice = response.choices[0]
 
@@ -156,3 +177,6 @@ async def chat(message: str, session_id: str, db: AsyncSession) -> dict:
             reply = choice.message.content
             memory.add_message(session_id, {"role": "assistant", "content": reply})
             return {"response": reply, "actions_taken": actions_taken}
+
+    logger.error("Agente excedio %d iteraciones para session '%s'", MAX_AGENT_ITERATIONS, session_id)
+    raise AgentTimeoutError(MAX_AGENT_ITERATIONS)

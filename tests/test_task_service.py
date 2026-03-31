@@ -229,11 +229,11 @@ class TestGetTasksSummary:
         assert summary["total_tasks"] == 0
 
 
-class TestGetWeeklyCompleted:
+class TestGetMonthlyCreated:
     @pytest.mark.asyncio
-    async def test_returns_7_days(self, db_session: AsyncSession):
-        days = await task_service.get_weekly_completed(db_session)
-        assert len(days) == 7
-        for d in days:
-            assert "date" in d
-            assert "count" in d
+    async def test_returns_5_months(self, db_session: AsyncSession):
+        months = await task_service.get_monthly_created(db_session)
+        assert len(months) == 5
+        for m in months:
+            assert "month" in m
+            assert "count" in m

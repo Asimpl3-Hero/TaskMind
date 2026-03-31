@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 
-from fastapi import HTTPException
 from sqlalchemy import select, update, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.exceptions import TaskNotFoundError
 from app.models.task import Task, TaskStatus, TaskPriority
 from app.schemas.task import TaskCreate, TaskUpdate, TaskFilters
 
@@ -35,7 +35,7 @@ async def get_task(db: AsyncSession, task_id: int) -> Task:
     result = await db.execute(select(Task).where(Task.id == task_id))
     task = result.scalar_one_or_none()
     if not task:
-        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+        raise TaskNotFoundError(task_id)
     return task
 
 
@@ -118,32 +118,46 @@ async def get_overdue_tasks(db: AsyncSession) -> list[Task]:
     return list(result.scalars().all())
 
 
-async def get_weekly_completed(db: AsyncSession) -> list[dict]:
+async def get_monthly_created(db: AsyncSession) -> list[dict]:
     now = datetime.utcnow()
-    monday = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    months = []
+    for offset in range(-2, 3):
+        year = now.year
+        month = now.month + offset
+        while month <= 0:
+            month += 12
+            year -= 1
+        while month > 12:
+            month -= 12
+            year += 1
+        months.append(datetime(year, month, 1))
 
     result = await db.execute(
         select(
-            func.date(Task.updated_at).label("day"),
+            func.extract("year", Task.created_at).label("year"),
+            func.extract("month", Task.created_at).label("month"),
             func.count(Task.id).label("count"),
         )
         .where(
-            Task.status == TaskStatus.completed,
-            Task.updated_at >= monday,
+            Task.created_at >= months[0],
+            Task.created_at < months[-1] + timedelta(days=31),
         )
-        .group_by(func.date(Task.updated_at))
-        .order_by(func.date(Task.updated_at))
+        .group_by(
+            func.extract("year", Task.created_at),
+            func.extract("month", Task.created_at),
+        )
     )
 
-    rows = {str(row.day): row.count for row in result.all()}
+    rows = {(int(r.year), int(r.month)): r.count for r in result.all()}
 
-    days = []
-    for i in range(7):
-        day = monday + timedelta(days=i)
-        day_str = day.strftime("%Y-%m-%d")
-        days.append({"date": day_str, "count": rows.get(day_str, 0)})
-
-    return days
+    return [
+        {
+            "month": m.strftime("%Y-%m"),
+            "count": rows.get((m.year, m.month), 0),
+        }
+        for m in months
+    ]
 
 
 async def get_tasks_summary(db: AsyncSession) -> dict:

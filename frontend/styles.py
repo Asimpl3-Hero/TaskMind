@@ -81,10 +81,39 @@ def inject_css():
             padding: 0.8rem;
         }
 
+        /* --- Overdue tasks --- */
+        .task-card-overdue {
+            border: 1px solid #e74c3c !important;
+            border-left: 4px solid #e74c3c !important;
+            background: rgba(231, 76, 60, 0.06);
+        }
+        .badge-overdue {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #fff;
+            background: #e74c3c;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
         /* --- Chat --- */
         .actions-box {
             background: var(--secondary-background-color);
-            border-left: 3px solid #0984e3;
+            border-left: 3px solid #00b894;
+            padding: 0.6rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+        }
+        .actions-box-error {
+            background: rgba(231, 76, 60, 0.06);
+            border-left: 3px solid #e74c3c;
             padding: 0.6rem 0.8rem;
             border-radius: 4px;
             font-size: 0.85rem;
