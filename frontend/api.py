@@ -2,7 +2,7 @@ import os
 import httpx
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
-TIMEOUT = 30
+TIMEOUT = int(os.getenv("API_TIMEOUT", "30"))
 
 
 def _client() -> httpx.Client:

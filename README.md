@@ -25,6 +25,7 @@ Sistema de gestion de tareas con agente de inteligencia artificial. Combina una 
 - [📄 Documentacion](#-documentacion)
 - [🚀 Instalacion y ejecucion](#-instalacion-y-ejecucion)
 - [📁 Estructura del proyecto](#-estructura-del-proyecto)
+- [🧪 Tests](#-tests)
 - [🧩 Decisiones tecnicas](#-decisiones-tecnicas)
 
 ---
@@ -266,6 +267,59 @@ TaskMind/
 ├── requirements.txt
 └── .env.example
 ```
+
+---
+
+## 🧪 Tests
+
+El proyecto cuenta con **124 pruebas unitarias** y de integracion que cubren el **90% del codigo** del backend.
+
+### Ejecutar los tests
+
+1. Instalar las dependencias de testing:
+   ```bash
+   pip install -r requirements-test.txt
+   ```
+
+2. Ejecutar los tests:
+   ```bash
+   pytest
+   ```
+
+3. Ejecutar con reporte de coverage:
+   ```bash
+   pytest --cov=app --cov-report=term-missing
+   ```
+
+### Estructura de tests
+
+```
+tests/
+├── conftest.py              # Fixtures compartidos (DB SQLite en memoria, cliente HTTP)
+├── test_models.py           # Modelo Task, enums TaskStatus y TaskPriority
+├── test_schemas.py          # Schemas Pydantic (TaskCreate, TaskUpdate, TaskResponse, TaskFilters)
+├── test_memory.py           # Historial de conversacion en memoria
+├── test_prompts.py          # Generacion del system prompt del agente
+├── test_tools.py            # Definiciones de herramientas de OpenAI
+├── test_task_service.py     # Logica de negocio (CRUD, bulk, conteo, urgentes, vencidas, resumen)
+├── test_agent_service.py    # Serializacion, ejecucion de herramientas y flujo de chat
+├── test_routers_tasks.py    # Endpoints CRUD de tareas (validaciones, filtros, 404)
+├── test_routers_agent.py    # Endpoints del agente IA (chat, limpiar historial)
+├── test_routers_summary.py  # Endpoints de resumen (semanal, diario con mock de OpenAI)
+└── test_main.py             # Health check, configuracion de la app y schema OpenAPI
+```
+
+### Coverage por modulo
+
+| Modulo | Coverage |
+|--------|----------|
+| `models/`, `schemas/`, `agent/memory`, `agent/prompts`, `agent/tools` | 100% |
+| `config.py`, `routers/agent.py`, `routers/tasks.py` | 100% |
+| `routers/summary.py` | 92% |
+| `main.py`, `services/agent_service.py` | 90% |
+| `database.py` | 80% |
+
+> Los tests usan **SQLite async en memoria** como base de datos y **mocks** para las llamadas a OpenAI, por lo que no requieren servicios externos para ejecutarse.
 
 ---
 
