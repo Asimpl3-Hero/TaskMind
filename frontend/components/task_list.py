@@ -51,10 +51,16 @@ def render(filters: dict):
             with c3:
                 st.write("")
                 if st.button("Guardar", key=f"save_{task['id']}", use_container_width=True):
-                    api.update_task(task["id"], {"status": new_status, "priority": new_prio})
-                    st.rerun()
+                    r = api.update_task(task["id"], {"status": new_status, "priority": new_prio})
+                    if r.status_code == 200:
+                        st.rerun()
+                    else:
+                        st.error("Error al actualizar la tarea.")
             with c4:
                 st.write("")
                 if st.button("Eliminar", key=f"del_{task['id']}", type="primary", use_container_width=True):
-                    api.delete_task(task["id"])
-                    st.rerun()
+                    r = api.delete_task(task["id"])
+                    if r.status_code == 204:
+                        st.rerun()
+                    else:
+                        st.error("Error al eliminar la tarea.")

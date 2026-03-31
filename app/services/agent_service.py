@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from openai import AsyncOpenAI
 from sqlalchemy.ext.asyncio import AsyncSession

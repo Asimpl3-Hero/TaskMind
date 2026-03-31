@@ -51,3 +51,9 @@ def get_summary() -> dict | None:
     with _client() as c:
         r = c.get("/api/summary/today")
     return r.json() if r.status_code == 200 else None
+
+
+def get_weekly_completed() -> list:
+    with _client() as c:
+        r = c.get("/api/summary/weekly-completed")
+    return r.json() if r.status_code == 200 else []

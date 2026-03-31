@@ -99,10 +99,9 @@ async def count_tasks(db: AsyncSession, filters: TaskFilters) -> int:
 
 
 async def get_most_urgent(db: AsyncSession) -> Task | None:
-    now = datetime.utcnow()
     result = await db.execute(
         select(Task)
-        .where(Task.due_date is not None, Task.due_date >= now, Task.status != TaskStatus.completed)
+        .where(Task.due_date.isnot(None), Task.status != TaskStatus.completed)
         .order_by(Task.due_date.asc())
         .limit(1)
     )
@@ -117,6 +116,34 @@ async def get_overdue_tasks(db: AsyncSession) -> list[Task]:
         .order_by(Task.due_date.asc())
     )
     return list(result.scalars().all())
+
+
+async def get_weekly_completed(db: AsyncSession) -> list[dict]:
+    now = datetime.utcnow()
+    monday = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    result = await db.execute(
+        select(
+            func.date(Task.updated_at).label("day"),
+            func.count(Task.id).label("count"),
+        )
+        .where(
+            Task.status == TaskStatus.completed,
+            Task.updated_at >= monday,
+        )
+        .group_by(func.date(Task.updated_at))
+        .order_by(func.date(Task.updated_at))
+    )
+
+    rows = {str(row.day): row.count for row in result.all()}
+
+    days = []
+    for i in range(7):
+        day = monday + timedelta(days=i)
+        day_str = day.strftime("%Y-%m-%d")
+        days.append({"date": day_str, "count": rows.get(day_str, 0)})
+
+    return days
 
 
 async def get_tasks_summary(db: AsyncSession) -> dict:

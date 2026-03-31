@@ -2,8 +2,8 @@ from datetime import datetime
 
 
 def get_system_prompt() -> str:
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    weekday = datetime.now().strftime("%A")
+    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    weekday = datetime.utcnow().strftime("%A")
     return (
         "Eres un asistente de gestión de tareas llamado TaskMind. "
         "Tu trabajo es ayudar al usuario a organizar, crear, consultar, actualizar y eliminar tareas.\n\n"

@@ -1,5 +1,3 @@
-import json
-
 import streamlit as st
 
 from frontend import api

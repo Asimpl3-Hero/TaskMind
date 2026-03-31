@@ -42,6 +42,23 @@ class SummaryResponse(BaseModel):
     analysis: str = Field(..., description="Diagnostico y sugerencias de priorizacion generados por el agente IA")
 
 
+class DayCount(BaseModel):
+    """Tareas completadas en un dia especifico."""
+    date: str = Field(..., description="Fecha en formato YYYY-MM-DD")
+    count: int = Field(..., description="Cantidad de tareas completadas ese dia")
+
+
+@router.get(
+    "/weekly-completed",
+    response_model=list[DayCount],
+    summary="Tareas completadas por dia (semana actual)",
+    description="Retorna la cantidad de tareas completadas por cada dia de la semana actual (lunes a domingo).",
+    responses={200: {"description": "Lista de 7 elementos con fecha y cantidad"}},
+)
+async def weekly_completed(db: AsyncSession = Depends(get_db)):
+    return await task_service.get_weekly_completed(db)
+
+
 @router.get(
     "/today",
     response_model=SummaryResponse,
