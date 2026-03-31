@@ -1,4 +1,4 @@
-# 🧠 TaskMind
+﻿# 🧠 TaskMind
 
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white)
@@ -12,7 +12,7 @@
 
 Sistema de gestion de tareas con agente de inteligencia artificial. Combina una API REST con un agente capaz de interpretar instrucciones en lenguaje natural y ejecutar acciones reales sobre los datos.
 
----
+## ![Preview Frontend](frontend/public/Preview.gif)
 
 ## 📋 Tabla de contenido
 
@@ -32,16 +32,16 @@ Sistema de gestion de tareas con agente de inteligencia artificial. Combina una 
 
 ## ⚙️ Stack
 
-| Capa | Tecnologia |
-|------|------------|
-| 🌐 Backend | FastAPI |
-| 🗄️ Base de datos | PostgreSQL 16 |
-| 🔗 ORM | SQLAlchemy (async) + asyncpg |
-| 📦 Migraciones | Alembic |
-| 🤖 IA | OpenAI API (GPT-4o) con tool calling |
-| 🖥️ Frontend | Streamlit |
-| 🐳 Contenedores | Docker y Docker Compose |
-| ✅ Validacion | Pydantic v2 |
+| Capa             | Tecnologia                           |
+| ---------------- | ------------------------------------ |
+| 🌐 Backend       | FastAPI                              |
+| 🗄️ Base de datos | PostgreSQL 16                        |
+| 🔗 ORM           | SQLAlchemy (async) + asyncpg         |
+| 📦 Migraciones   | Alembic                              |
+| 🤖 IA            | OpenAI API (GPT-4o) con tool calling |
+| 🖥️ Frontend      | Streamlit                            |
+| 🐳 Contenedores  | Docker y Docker Compose              |
+| ✅ Validacion    | Pydantic v2                          |
 
 ---
 
@@ -49,16 +49,16 @@ Sistema de gestion de tareas con agente de inteligencia artificial. Combina una 
 
 Cada tarea contiene:
 
-| Campo | Tipo | Descripcion |
-|-------|------|-------------|
-| `id` | int | Identificador unico (auto-increment) |
-| `title` | str | Titulo de la tarea (obligatorio) |
-| `description` | str | Descripcion opcional |
-| `status` | enum | `pending`, `in_progress`, `completed` |
-| `priority` | enum | `low`, `medium`, `high` |
-| `due_date` | datetime | Fecha limite |
-| `created_at` | datetime | Fecha de creacion (automatica) |
-| `updated_at` | datetime | Ultima actualizacion (automatica) |
+| Campo         | Tipo     | Descripcion                           |
+| ------------- | -------- | ------------------------------------- |
+| `id`          | int      | Identificador unico (auto-increment)  |
+| `title`       | str      | Titulo de la tarea (obligatorio)      |
+| `description` | str      | Descripcion opcional                  |
+| `status`      | enum     | `pending`, `in_progress`, `completed` |
+| `priority`    | enum     | `low`, `medium`, `high`               |
+| `due_date`    | datetime | Fecha limite                          |
+| `created_at`  | datetime | Fecha de creacion (automatica)        |
+| `updated_at`  | datetime | Ultima actualizacion (automatica)     |
 
 ---
 
@@ -66,27 +66,27 @@ Cada tarea contiene:
 
 ### 📝 Tareas — `/api/tasks`
 
-| Metodo | Ruta | Descripcion |
-|--------|------|-------------|
-| `POST` | `/api/tasks` | Crear una tarea |
-| `GET` | `/api/tasks` | Listar tareas con filtros opcionales (`status`, `priority`, `date_from`, `date_to`) |
-| `GET` | `/api/tasks/{id}` | Obtener detalle de una tarea |
-| `PUT` | `/api/tasks/{id}` | Actualizar una tarea |
-| `DELETE` | `/api/tasks/{id}` | Eliminar una tarea |
+| Metodo   | Ruta              | Descripcion                                                                         |
+| -------- | ----------------- | ----------------------------------------------------------------------------------- |
+| `POST`   | `/api/tasks`      | Crear una tarea                                                                     |
+| `GET`    | `/api/tasks`      | Listar tareas con filtros opcionales (`status`, `priority`, `date_from`, `date_to`) |
+| `GET`    | `/api/tasks/{id}` | Obtener detalle de una tarea                                                        |
+| `PUT`    | `/api/tasks/{id}` | Actualizar una tarea                                                                |
+| `DELETE` | `/api/tasks/{id}` | Eliminar una tarea                                                                  |
 
 ### 🤖 Agente IA — `/api/agent`
 
-| Metodo | Ruta | Descripcion |
-|--------|------|-------------|
-| `POST` | `/api/agent/chat` | Enviar mensaje en lenguaje natural al agente |
-| `DELETE` | `/api/agent/history` | Limpiar historial de conversacion |
+| Metodo   | Ruta                 | Descripcion                                  |
+| -------- | -------------------- | -------------------------------------------- |
+| `POST`   | `/api/agent/chat`    | Enviar mensaje en lenguaje natural al agente |
+| `DELETE` | `/api/agent/history` | Limpiar historial de conversacion            |
 
 ### 📊 Resumen — `/api/summary`
 
-| Metodo | Ruta | Descripcion |
-|--------|------|-------------|
-| `GET` | `/api/summary/today` | Resumen del dia con estadisticas y analisis IA |
-| `GET` | `/api/summary/weekly-completed` | Tareas completadas por dia (semana actual) |
+| Metodo | Ruta                            | Descripcion                                    |
+| ------ | ------------------------------- | ---------------------------------------------- |
+| `GET`  | `/api/summary/today`            | Resumen del dia con estadisticas y analisis IA |
+| `GET`  | `/api/summary/weekly-completed` | Tareas completadas por dia (semana actual)     |
 
 ---
 
@@ -94,30 +94,30 @@ Cada tarea contiene:
 
 El agente interpreta instrucciones en lenguaje natural y ejecuta acciones sobre las tareas usando **tool calling** de OpenAI. Cuenta con 10 herramientas:
 
-| Herramienta | Descripcion |
-|-------------|-------------|
-| `create_task` | ➕ Crear una nueva tarea |
-| `list_tasks` | 📋 Listar tareas con filtros |
-| `get_task` | 🔍 Obtener detalle de una tarea por ID |
-| `update_task` | ✏️ Actualizar campos de una tarea |
-| `delete_task` | 🗑️ Eliminar una tarea por ID |
+| Herramienta          | Descripcion                                      |
+| -------------------- | ------------------------------------------------ |
+| `create_task`        | ➕ Crear una nueva tarea                         |
+| `list_tasks`         | 📋 Listar tareas con filtros                     |
+| `get_task`           | 🔍 Obtener detalle de una tarea por ID           |
+| `update_task`        | ✏️ Actualizar campos de una tarea                |
+| `delete_task`        | 🗑️ Eliminar una tarea por ID                     |
 | `bulk_update_status` | 🔄 Cambiar estado de multiples tareas por filtro |
-| `bulk_delete` | 🗑️ Eliminar multiples tareas por filtro |
-| `count_tasks` | 🔢 Contar tareas con filtros |
-| `get_most_urgent` | 🚨 Obtener la tarea mas urgente |
-| `get_overdue_tasks` | ⏰ Obtener tareas vencidas |
+| `bulk_delete`        | 🗑️ Eliminar multiples tareas por filtro          |
+| `count_tasks`        | 🔢 Contar tareas con filtros                     |
+| `get_most_urgent`    | 🚨 Obtener la tarea mas urgente                  |
+| `get_overdue_tasks`  | ⏰ Obtener tareas vencidas                       |
 
 ### 💬 Ejemplos de instrucciones
 
-> *"Crea una tarea llamada 'Revisar propuesta' con prioridad alta para el viernes"*
+> _"Crea una tarea llamada 'Revisar propuesta' con prioridad alta para el viernes"_
 >
-> *"¿Cuantas tareas tengo pendientes esta semana?"*
+> _"¿Cuantas tareas tengo pendientes esta semana?"_
 >
-> *"Marca como completadas todas las tareas de prioridad baja"*
+> _"Marca como completadas todas las tareas de prioridad baja"_
 >
-> *"¿Cual es la tarea mas urgente que tengo?"*
+> _"¿Cual es la tarea mas urgente que tengo?"_
 >
-> *"Elimina todas las tareas que ya estan completadas"*
+> _"Elimina todas las tareas que ya estan completadas"_
 
 El historial de conversacion se mantiene en memoria por `session_id` mientras el servidor esta activo.
 
@@ -136,11 +136,11 @@ El endpoint `GET /api/summary/today` retorna:
 
 Interfaz web con Streamlit organizada en 3 pestanas:
 
-| Pestana | Descripcion |
-|---------|-------------|
-| 📝 **Tareas** | Lista de tareas con filtros, creacion desde sidebar, edicion inline y eliminacion |
-| 🤖 **Agente IA** | Chat interactivo con el agente. Muestra las acciones ejecutadas |
-| 📊 **Resumen del dia** | Dashboard con grafico de completadas por dia, estadisticas y analisis IA |
+| Pestana                | Descripcion                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------- |
+| 📝 **Tareas**          | Lista de tareas con filtros, creacion desde sidebar, edicion inline y eliminacion |
+| 🤖 **Agente IA**       | Chat interactivo con el agente. Muestra las acciones ejecutadas                   |
+| 📊 **Resumen del dia** | Dashboard con grafico de completadas por dia, estadisticas y analisis IA          |
 
 ---
 
@@ -148,11 +148,11 @@ Interfaz web con Streamlit organizada en 3 pestanas:
 
 La API cuenta con documentacion interactiva generada automaticamente por FastAPI:
 
-| Recurso | URL | Descripcion |
-|---------|-----|-------------|
-| 📘 Swagger UI | `http://localhost:8000/docs` | Documentacion interactiva con interfaz para probar cada endpoint directamente desde el navegador |
-| 📕 ReDoc | `http://localhost:8000/redoc` | Documentacion alternativa con vista de referencia detallada |
-| 📦 OpenAPI JSON | `http://localhost:8000/openapi.json` | Esquema OpenAPI 3.1 en formato JSON para integraciones externas |
+| Recurso         | URL                                  | Descripcion                                                                                      |
+| --------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| 📘 Swagger UI   | `http://localhost:8000/docs`         | Documentacion interactiva con interfaz para probar cada endpoint directamente desde el navegador |
+| 📕 ReDoc        | `http://localhost:8000/redoc`        | Documentacion alternativa con vista de referencia detallada                                      |
+| 📦 OpenAPI JSON | `http://localhost:8000/openapi.json` | Esquema OpenAPI 3.1 en formato JSON para integraciones externas                                  |
 
 Todos los endpoints incluyen descripciones, ejemplos de request/response y codigos de estado documentados.
 
@@ -163,17 +163,20 @@ Todos los endpoints incluyen descripciones, ejemplos de request/response y codig
 ### 🐳 Con Docker (recomendado)
 
 1. Clonar el repositorio:
+
    ```bash
    git clone https://github.com/<tu-usuario>/TaskMind.git
    cd TaskMind
    ```
 
 2. Crear el archivo `.env` a partir del ejemplo:
+
    ```bash
    cp .env.example .env
    ```
 
 3. Configurar las variables en `.env`:
+
    ```env
    DATABASE_URL=postgresql+asyncpg://postgres:1234@db:5432/taskmind
    OPENAI_API_KEY=sk-proj-...
@@ -181,6 +184,7 @@ Todos los endpoints incluyen descripciones, ejemplos de request/response y codig
    ```
 
 4. Levantar los servicios:
+
    ```bash
    docker compose up --build
    ```
@@ -193,6 +197,7 @@ Todos los endpoints incluyen descripciones, ejemplos de request/response y codig
 ### 💻 Sin Docker
 
 1. Crear y activar un entorno virtual:
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # Linux/Mac
@@ -200,11 +205,13 @@ Todos los endpoints incluyen descripciones, ejemplos de request/response y codig
    ```
 
 2. Instalar dependencias:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. Configurar `.env` con la URL de una base de datos PostgreSQL local:
+
    ```env
    DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/taskmind
    OPENAI_API_KEY=sk-proj-...
@@ -212,11 +219,13 @@ Todos los endpoints incluyen descripciones, ejemplos de request/response y codig
    ```
 
 4. Ejecutar migraciones:
+
    ```bash
    alembic upgrade head
    ```
 
 5. Iniciar el backend:
+
    ```bash
    uvicorn app.main:app --reload
    ```
@@ -277,11 +286,13 @@ El proyecto cuenta con **124 pruebas unitarias** y de integracion que cubren el 
 ### Ejecutar los tests
 
 1. Instalar las dependencias de testing:
+
    ```bash
    pip install -r requirements-test.txt
    ```
 
 2. Ejecutar los tests:
+
    ```bash
    pytest
    ```
@@ -311,13 +322,13 @@ tests/
 
 ### Coverage por modulo
 
-| Modulo | Coverage |
-|--------|----------|
-| `models/`, `schemas/`, `agent/memory`, `agent/prompts`, `agent/tools` | 100% |
-| `config.py`, `routers/agent.py`, `routers/tasks.py` | 100% |
-| `routers/summary.py` | 92% |
-| `main.py`, `services/agent_service.py` | 90% |
-| `database.py` | 80% |
+| Modulo                                                                | Coverage |
+| --------------------------------------------------------------------- | -------- |
+| `models/`, `schemas/`, `agent/memory`, `agent/prompts`, `agent/tools` | 100%     |
+| `config.py`, `routers/agent.py`, `routers/tasks.py`                   | 100%     |
+| `routers/summary.py`                                                  | 92%      |
+| `main.py`, `services/agent_service.py`                                | 90%      |
+| `database.py`                                                         | 80%      |
 
 > Los tests usan **SQLite async en memoria** como base de datos y **mocks** para las llamadas a OpenAI, por lo que no requieren servicios externos para ejecutarse.
 
